@@ -9,6 +9,23 @@
 </head>
 <body>
     <div id="app">
+        <h2>Todo count: {{ todo_count }}</h2>
+        <single-todo v-for="(todo, index) in todos"
+            :todo="todo"
+            :key="index">
+
+        </single-todo>
+
+        <form @submit.prevent="submitTodo">
+            <div class="form-group">
+                <label for="todoContent">New Todo:</label>
+                <input type="text"
+                    class="form-control"
+                    id="todoContent"
+                    v-model="todo">
+
+            </div>
+        </form>
 
     </div>
 
