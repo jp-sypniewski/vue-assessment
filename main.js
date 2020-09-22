@@ -1,14 +1,63 @@
-Vue.component('single-todo', {
+Vue.component('todos', {
     props: {
-        todo: {
-            type: String,
+        todos: {
+            type: Array,
+            required: true
+        },
+        remaining: {
+            type: Number,
             required: true
         }
     },
+    data() {
+        return {
+            new_todo: null,
+            error: null
+        }
+    },
+    methods: {
+        submitTodo() {
+            if (this.new_todo) {
+                this.$emit("add-todo", this.new_todo);
+                this.new_todo = null;
+                if (this.error) {
+                    this.error = null;
+                }
+            } else {
+                this.error = "The input field cannot be blank";
+            }
+        },
+        removeTodo(todo) {
+            this.$emit("remove-todo", todo);
+        }
+    },
     template: `
-        <div class="mb-2">
-            <p> {{ todo }} </p>
-            <button>X</button>
+        <div class="container mt-2">
+            <p><strong>Remaining Tasks: {{ remaining }} </strong></p>
+
+            <input type="text" class="form-control" placeholder="What do you need to do?"
+                v-model="new_todo"
+                @keyup.enter="submitTodo">
+            
+            <br v-if="error">
+
+            <p v-if="error"> {{ error }} </p>
+
+            <br>
+
+            <div class="single-todo"
+                v-for="(todo, index) in todos"
+                :todo="todo"
+                :key="index">
+                <div class="alert alert-success">
+
+                    {{ todo }}
+                    <button type="button" class="close"
+                        @click="removeTodo(todo)">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            </div>
         </div>
     `
 })
@@ -19,22 +68,20 @@ var app = new Vue({
     data: {
         todo: '',
         todos: [],
-        todo_count: 0,
-        error: null
+    },
+    computed: {
+        todoCount() {
+            return this.todos.length;
+        }
     },
     methods: {
-        submitTodo(){
-            if (this.todo) {
-                let new_todo = this.todo;
-                this.todos.push(new_todo);
-                this.todo = null;
-                if (this.error) {
-                    this.error = null;
-                }
-                this.todo_count += 1;
-            } else {
-                this.error = 'You must insert text for todo';
-            }
+
+        addTodo(new_todo){
+            this.todos.push(new_todo);
+        },
+
+        removeTodo(a_todo) {
+            this.todos.splice(this.todos.indexOf(a_todo), 1);
         }
     }
 })
